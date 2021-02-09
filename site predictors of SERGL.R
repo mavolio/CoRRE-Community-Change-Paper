@@ -417,7 +417,6 @@ parameter<-c(
   losses = "Species losses"
 )
 
-
 mr<-
 ggplot(data=subset(forbigfig, predictor2!="(Intercept)"), aes(x=predictor2, y=slope, fill=rsq)) + 
   geom_col() + 
