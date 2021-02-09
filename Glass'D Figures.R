@@ -352,10 +352,10 @@ ggplot(data=subset(glassD_alldata, trt_type2=="R"|trt_type2=="Mult R"|trt_type2=
   geom_boxplot()+
   ylab("Glass's D")+
   xlab("")+
-  scale_x_discrete(limits=c("NonR", 'R', "Mult R", "R+NonR"), labels=c("Non-Res.","Single Res.", "Multiple Res.", "Res.+Non-Res."))+
-  scale_fill_manual(values=c("red", "gray", "orange", "gold"))+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "none")+
+  #scale_x_discrete(limits=c("NonR", 'R', "Mult R", "R+NonR"), labels=c("Non-Res.","Single Res.", "Multiple Res.", "Res.+Non-Res."))+
+  scale_fill_manual(name = "Treatment\nType", values=c("red", "gray", "orange", "gold"))+
+  theme(axis.text.x = element_blank())+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   geom_hline(yintercept = 0)+
   geom_point(aes(trt_type2, location), shape=8, size=3)+
   facet_wrap(~response_var2, labeller=labeller(response_var2=response_label), ncol=3, scales="free_y")
@@ -364,10 +364,10 @@ ggplot(data=subset(glassD_alldata, trt_type2!="R"&trt_type2!="Mult R"&trt_type2!
   geom_boxplot()+
   ylab("Glass's D")+
   xlab("")+
-  scale_x_discrete(limits=c("All GCDs", "CO2","Irrigation","Precip. Vari." ,"Temperature","N","P", "Mult. Nuts."), labels=c("All GCDs",  "CO2","Irrigation","Precip. Vari.", "Temp","Nitrogen","Phosphorus", "Mult. Nuts."))+
-  scale_fill_manual(values=c("black", "green3",'blue','darkorange', 'orange', 'gold3','lightblue', "red"))+
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position = "none")+
+  #scale_x_discrete(limits=c("All GCDs", "CO2","Irrigation","Precip. Vari." ,"Temperature","N","P", "Mult. Nuts."), labels=c("All GCDs",  "CO2","Irrigation","Precip. Vari.", "Temp","Nitrogen","Phosphorus", "Mult. Nuts."))+
+  scale_fill_manual(name = "GCD Treatment", values=c("black", "green3",'blue','darkorange', 'orange', 'gold3','lightblue', "red"))+
+  theme(axis.text.x = element_blank())+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   geom_vline(xintercept = 1.5, size = 0.5)+
   geom_hline(yintercept = 0)+
   geom_point(aes(trt_type2, location), shape=8, size=3)+
