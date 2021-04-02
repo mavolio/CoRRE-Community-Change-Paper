@@ -478,3 +478,99 @@ jsp<-subset(corredat, site_project_comm == "JSP_GCE_0"& plot_id == 62 & treatmen
 ggplot(data = jsp, aes(x = rank, y= relcov ))+
   geom_line()+
   facet_wrap(~treatment_year)
+
+
+# Assesing temporal sampling bias -----------------------------------------
+
+setwd("C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG")
+dat<-read.csv("MetricsTrts_March2019.csv")
+
+#are there differences between the pretreatment and first year of data for experiemtns with pretreatment data?
+
+pretrtdata<-dat%>%
+  filter(treatment_year==0)%>%
+  filter(site_project_comm %in% c("JSP_GCE_0", "KNZ_pplots_0", "KUFS_E6_type1", "KUFS_E6_type2", "NWT_snow_0", "PIE_TIDE_0", "SEV_EDGE_EB", "SEV_EDGE_EG"))
+
+
+pvals<-data.frame()
+
+sites<-unique(pretrtdata$site_project_comm)
+
+for (i in 1:length(sites)){
+  
+  subset<-pretrtdata%>%
+    filter(site_project_comm==sites[i])%>%
+    filter(plot_mani!=0)
+  
+  subseetc<-pretrtdata%>%
+    filter(site_project_comm==sites[i])%>%
+    filter(plot_mani==0)
+  
+  trt<-unique(subset$treatment)
+    
+  for (j in 1:length(trt)){
+    subsett<-subset%>%
+      filter(treatment==trt[j])
+    
+    combine<-subsetc%>%
+      bind_rows(subsett)
+    
+    rich<-summary(aov(abs(richness_change)~treatment, data=combine))
+    outr<-rich[[1]]$"Pr(>F)"[1]
+    
+    even<-summary(aov(abs(evenness_change)~treatment, data=combine))
+    oute<-even[[1]]$"Pr(>F)"[1]
+    
+    
+    rank<-summary(aov(rank_change~treatment, data=combine))
+    outra<-rank[[1]]$"Pr(>F)"[1]
+    
+    
+    gain<-summary(aov(gains~treatment, data=combine))
+    outg<-gain[[1]]$"Pr(>F)"[1]
+    
+    
+    loss<-summary(aov(losses~treatment, data=combine))
+    outl<-loss[[1]]$"Pr(>F)"[1]
+    
+    output<-data.frame(
+      site_project_comm=unique(subset$site_project_comm),
+      treatment=unique(subsett$treatment),
+      rich=outr,
+      even=oute,
+      rank=outra,
+      gain=outg,
+      loss=outl
+    )
+    pvals<-pvals%>%
+      bind_rows(output)
+    }
+
+}
+
+adjust<-pvals%>%
+  gather(measure, pval, rich:loss)%>%
+  group_by(site_project_comm)%>%
+  mutate(adj=p.adjust(pval, "BH"))
+
+#only 8 out of 240 are sig. 
+
+#WHen data collection began after year one did we miss the community change?
+
+
+using<-read.csv("C2E/Products/CommunityChange/March2018 WG/experiment_trt_subset_May2019.csv")%>%
+  select(site_project_comm)%>%
+  unique()%>%
+  mutate(use=1)
+
+samplinglag<-dat%>%
+  select(site_project_comm, treatment_year, treatment_year2)%>%
+  unique()%>%
+  filter(treatment_year!=0)%>%
+  group_by(site_project_comm)%>%
+  mutate(min=min(treatment_year))%>%
+  filter(treatment_year==min)%>%
+  right_join(using)
+
+#for these experiments I checked whether we say sig gam differences. We did for all but SEV_Nfert.
+
