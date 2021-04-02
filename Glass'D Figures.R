@@ -696,3 +696,55 @@ ggplot(data=glassD_alldata_box, aes(x=trt_type2, y=abs(mglassd), fill=trt_type2)
 #   ggtitle("Sig Only - 5")
 # 
 # grid.arrange(a, b, ncol=2)
+
+
+# Relationship between treatment level and community change ---------------
+info.trt.levels<-read.csv("converge_diverge/datasets/LongForm/ExperimentInformation_March2019.csv")%>%
+  select(site_code, project_name, community_type, treatment,plot_mani, resource_mani, trt_type, n, p, temp, precip, CO2)%>%
+  unique()%>%
+  filter(plot_mani!=0)%>%
+  mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))%>%
+  mutate(use=ifelse(trt_type=="N"|trt_type=="P"|trt_type=="CO2"|trt_type=="irr"|trt_type=="temp", 1, 0))
+
+trt.level<-allyears_all%>%
+  select(-use)%>%
+  left_join(info.trt.levels)%>%
+  filter(use==1)%>%
+  mutate(amt=ifelse(trt_type=="N", n, ifelse(trt_type=="P", p, ifelse(trt_type=="CO2", CO2, ifelse(trt_type=="irr", precip, ifelse(trt_type=="temp", temp, 999))))))%>%
+  mutate(response_var=factor(response_var, levels=c("richness_change_abs", "evenness_change_abs", "rank_change", "gains", "losses")))
+
+
+#figure for paper
+stats<-trt.level%>%
+  group_by(response_var, trt_type)%>%
+  summarize(r.value = round(cor.test(mglassd, amt)$estimate, 3),
+         p.value = cor.test(mglassd, amt)$p.value)%>%
+  mutate(ajdp=p.adjust(p.value, "BH"))
+
+#make new labels for facet_wrap step  
+collabel<-c(
+  CO2="CO2", 
+  irr="Irrigation",
+  N="Nitrogen",
+  P="Phosphorus",
+  temp="Temperature")
+
+rowlabel<-c(
+  richness_change_abs="Richness\nchange", 
+  evenness_change_abs="Evenness\nchange",
+  rank_change="Rank\nchange",
+  gains="Gains",
+  losses="Losses")
+
+
+ggplot(data=trt.level, aes(x=amt, y=mglassd))+
+  geom_point()+
+  facet_grid(response_var~trt_type, scales="free", labeller=labeller(response_var=rowlabel, trt_type=collabel))+
+  geom_text(data=stats, aes(x=Inf, y=Inf, label=r.value), hjust=1.05, vjust=1.5)+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  xlab("Amount added")+
+  ylab("Mean Glass' D")
+
+
+  
+
