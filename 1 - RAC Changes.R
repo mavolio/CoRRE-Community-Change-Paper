@@ -75,7 +75,7 @@ plotinfo<-corredat_raw%>%
 # Calculating richness and evenness  --------------------------------------
 
 spc<-unique(corredat_raw$site_project_comm)
-div_evar<-data.frame()
+rich_evar<-data.frame()
 
 for (i in 1:length(spc)){
   subset<-corredat_raw%>%
@@ -84,10 +84,10 @@ for (i in 1:length(spc)){
   out<-community_structure(subset, time.var = 'calendar_year', abundance.var = 'relcov', replicate.var = 'plot_id')
   out$site_project_comm<-spc[i]
   
-  div_evar<-rbind(div_evar, out)
+  rich_evar<-rbind(rich_evar, out)
 }
 
-write.csv(div_evar, "C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG\\CORRE_DivEvar.csv", row.names=F)
+write.csv(rich_evar, "C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\CORRE_RichEvar.csv", row.names=F)
 
 # calculating RAC changes using codyn -------------------------------------
 ####based on treatment_year
@@ -109,12 +109,12 @@ for (i in 1:length(spc)){
 dat<-delta_rac%>%
   left_join(plotinfo)
 
-write.csv(dat, "C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG\\CoRRE_RAC_Metrics.csv", row.names=F)
+write.csv(dat, "C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\CoRRE_RAC_Measures.csv", row.names=F)
 
 
 
 ###doing for without rare species
-treatment_info<-read.csv("ExperimentInformation_March2019.csv")%>%
+treatment_info<-read.csv("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\ExperimentInformation_March2019.csv")%>%
   dplyr::select(site_code, project_name, community_type, treatment,plot_mani)%>%
   unique()%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))
@@ -149,15 +149,14 @@ delta_rac_nr2<-delta_rac_nr%>%
   left_join(plotinfo)
 
 
-write.csv(delta_rac_nr2, "C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG\\CORRE_RAC_Metrics_norares.csv", row.names = F)
+write.csv(delta_rac_nr2, "C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\CORRE_RAC_Measures_norares.csv", row.names = F)
 
 
 
 # Assessing temporal sampling bias -----------------------------------------
 
-setwd("C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG")
-dat<-read.csv("CoRRE_RAC_Metrics.csv")
-plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
+dat<-read.csv("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\CoRRE_RAC_Measures.csv")
+plot_mani<-read.csv("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\ExperimentInformation_March2019.csv")%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, plot_mani, treatment)%>%
   unique()
@@ -241,7 +240,7 @@ adjust<-pvals%>%
 
 #When data collection began after year one did we miss the community change?
 
-using<-read.csv("Experiment_Trt_Subset.csv")%>%
+using<-read.csv("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\Experiment_Trt_Subset.csv")%>%
   select(site_project_comm)%>%
   unique()%>%
   mutate(use=1)
