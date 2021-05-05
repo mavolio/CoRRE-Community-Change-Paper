@@ -35,7 +35,7 @@ plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
   unique()
 
 # read in site level predictor variables
-info.spc=read.csv("SiteExperimentDetails_April2019.csv") %>%
+info.spc=read.csv("SiteExperimentDetails_March2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, rrich, anpp, MAT, MAP)%>%
   unique()
@@ -55,7 +55,7 @@ evenness<-div_evar%>%
 
 
 # read in site level predictor variables
-info.spc=read.csv("SiteExperimentDetails_April2019.csv") %>%
+info.spc=read.csv("SiteExperimentDetails_March2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, rrich, anpp, MAT, MAP)%>%
   unique()
