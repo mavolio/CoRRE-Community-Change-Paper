@@ -11,25 +11,23 @@ library(tidyverse)
 library(gridExtra)
 theme_set(theme_bw(12))
 
-#work
-setwd("C:\\Users\\mavolio2\\Dropbox\\")
-#home
-setwd("~/Dropbox/")
+#meghan wd
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
 
 #read in and drop sucessional treatments (those that had a big disturbance to start)
-gam<-read.csv("C2E/Products/CommunityChange/Summer2018_Results/gam_comparison_table_norarelast_year.csv")%>%
+gam<-read.csv("GamSigTable_norare.csv")%>%
   rename(site_project_comm=site_proj_comm)%>%
   separate(site_project_comm, into=c("site_code","project_name","community_type"), sep="_", remove=F)
 
 #filter the press treatments for the experiments with enough data
-trt_touse<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformation_March2019.csv")%>%
+trt_touse<-read.csv("ExperimentInformation_March2019.csv")%>%
   filter(pulse==0, plot_mani!=0)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_")) %>% 
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
   mutate(use=ifelse(trt_type=="N"|trt_type=="P"|trt_type=="CO2"|trt_type=="irr"|trt_type=="temp"|trt_type=="N*P"|trt_type=="mult_nutrient"|trt_type=='precip_vari', 1, 0))
 
-info.trt2<-read.csv("C2E\\Products\\CommunityChange\\March2018 WG\\ForAnalysis_allAnalysisAllDatasets_04082019.csv") %>%
+info.trt2<-read.csv("SiteExperimentDetails_March2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
@@ -142,199 +140,3 @@ ggplot(sig_tograph2, aes(x = response_var2, y = value, fill = sig)) +
   geom_vline(xintercept = 5.5, linetype="dashed")
 
 
-############################
-#########################
-###This is where I stopped.
-
-###how does this differ by GCD?
-
-gamtrts_metrics<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change", use == 1)%>%
-  group_by(response_var, trt_type2) %>%
-  summarise(
-    num_sig = length(which(sig_diff_cntrl_trt == "yes")),
-    num_nonsig = length(which(sig_diff_cntrl_trt == "no"))
-  )
-
-gamtrts3_metrics<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change")%>%
-  group_by(response_var, trt_type3) %>%
-  summarise(
-    num_sig = length(which(sig_diff_cntrl_trt == "yes")),
-    num_nonsig = length(which(sig_diff_cntrl_trt == "no"))
-  )%>%
-  rename(trt_type2=trt_type3)
-
-
-#for emily's bionomial analsis
-gamtrts_metrics_em<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change", use == 1)%>%
-  mutate(sigdiff=ifelse(sig_diff_cntrl_trt=="no", 0, 1))%>%
-  select(site_project_comm, treatment, response_var, site_code, project_name, community_type, trt_type2, sigdiff)
-
-#write.csv(gamtrts_metrics_em, "C2E/Products/CommunityChange/Summer2018_Results/sig_diff_by_trts_May2019.csv", row.names = F)
-
-# #wihtin a GCD is there a differnce?
-CO2 <- gamtrts_metrics%>%filter(trt_type2=='CO2')
-prop.test(x=as.matrix(CO2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-# 
-#N
-N <- gamtrts_metrics%>%filter(trt_type2=='N')
-prop.test(x=as.matrix(N[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#P
-P <- gamtrts_metrics%>%filter(trt_type2=='P')
-prop.test(x=as.matrix(P[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#irr
-irr <- gamtrts_metrics%>%filter(trt_type2=='Irrigation')
-prop.test(x=as.matrix(irr[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#mult nuts
-multnuts <- gamtrts_metrics%>%filter(trt_type2=='Mult. Nuts.')
-prop.test(x=as.matrix(multnuts[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#temp
-temp <- gamtrts_metrics%>%filter(trt_type2=='Temperature')
-prop.test(x=as.matrix(temp[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#precip var
-pv <- gamtrts_metrics%>%filter(trt_type2=='Precip. Vari.')
-prop.test(x=as.matrix(pv[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-# #within a manipulation type is there a differnce?
-nonres <- gamtrts3_metrics%>%filter(trt_type2=='Non-Res.')
-prop.test(x=as.matrix(nonres[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-# 
-#N
-res <- gamtrts3_metrics%>%filter(trt_type2=='Res.')
-prop.test(x=as.matrix(res[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#P
-multres <- gamtrts3_metrics%>%filter(trt_type2=='Mult. Res.')
-prop.test(x=as.matrix(multres[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#irr
-rn<- gamtrts3_metrics%>%filter(trt_type2=='Res.+Non-Res.')
-prop.test(x=as.matrix(rn[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#mult nuts
-multnuts <- gamtrts_metrics%>%filter(trt_type2=='Mult. Nuts.')
-prop.test(x=as.matrix(multnuts[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-# ###now looking within communitychange
-# 
-rich <- gamtrts_metrics%>%filter(response_var=='richness_change_abs')
-prop.test(x=as.matrix(rich[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-even <- gamtrts_metrics%>%filter(response_var=='evenness_change_abs')
-prop.test(x=as.matrix(even[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#rank
-rank <- gamtrts_metrics%>%filter(response_var=='rank_change')
-prop.test(x=as.matrix(rank[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#gain
-gain <- gamtrts_metrics%>%filter(response_var=='gains')
-prop.test(x=as.matrix(gain[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#loss
-loss <- gamtrts_metrics%>%filter(response_var=='losses')
-prop.test(x=as.matrix(loss[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-# ###now looking within communitychange
-# 
-rich2 <- gamtrts3_metrics%>%filter(response_var=='richness_change_abs')
-prop.test(x=as.matrix(rich2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-even2 <- gamtrts3_metrics%>%filter(response_var=='evenness_change_abs')
-prop.test(x=as.matrix(even2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#rank
-rank2 <- gamtrts3_metrics%>%filter(response_var=='rank_change')
-prop.test(x=as.matrix(rank2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#gain
-gain2 <- gamtrts3_metrics%>%filter(response_var=='gains')
-prop.test(x=as.matrix(gain2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-#loss
-loss2 <- gamtrts3_metrics%>%filter(response_var=='losses')
-prop.test(x=as.matrix(loss2[c('num_sig', 'num_nonsig')]), alternative='two.sided')
-
-
-numexp_trt<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change", use == 1)%>%
-  select(site_project_comm, treatment, trt_type2)%>%
-  unique
-         
-anysig_gamtrts_metrics<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change", use == 1, sig_diff_cntrl_trt=="yes")%>%
-  select(site_project_comm, treatment, sig_diff_cntrl_trt, trt_type2)%>%
-  unique()%>%
-  right_join(numexp_trt)%>%
-  mutate(sig_diff=ifelse(is.na(sig_diff_cntrl_trt), "no", "yes"))%>%
-  group_by(trt_type2) %>%
-  summarise(
-    num_sig = length(which(sig_diff == "yes")),
-    num_nonsig = length(which(sig_diff == "no"))
-  )%>%
-  mutate(response_var="any_change")
-
-numexp_trt2<-metrics_sig%>%
-  filter(response_var != "composition_change")%>%
-  select(site_project_comm, treatment)%>%
-  left_join(info.trt2)%>%
-  unique()
-
-anysig_gamtrts3_metrics<-metrics_sig%>%
-  ungroup()%>%
-  filter(response_var != "composition_change", sig_diff_cntrl_trt=="yes")%>%
-  select(site_project_comm, treatment, sig_diff_cntrl_trt, trt_type3)%>%
-  unique()%>%
-  right_join(numexp_trt2)%>%
-  mutate(sig_diff=ifelse(is.na(sig_diff_cntrl_trt), "no", "yes"))%>%
-  group_by(trt_type3) %>%
-  summarise(
-    num_sig = length(which(sig_diff == "yes")),
-    num_nonsig = length(which(sig_diff == "no"))
-  )%>%
-  mutate(response_var="any_change")%>%
-  rename(trt_type2=trt_type3)
-
-
-tograph_metrics_trt<-gamtrts_metrics%>%
-  bind_rows(anysig_gamtrts_metrics, gamtrts3_metrics, anysig_gamtrts3_metrics)%>%
-  mutate(sum = num_sig + num_nonsig,
-         psig = num_sig/sum,
-         pnonsig = num_nonsig/sum)%>%
-  select(-num_sig, -num_nonsig, -sum)%>%
-  gather(key = sig, value = value, -trt_type2, -response_var) %>%
-  mutate(group=factor(response_var, levels = c("any_change", "evenness_change_abs", "rank_change", "gains", "losses", "richness_change_abs")))%>%
-  mutate(trt_type3=factor(trt_type2,levels = c("Mult. Nuts.", "P", "N", "Temperature","Precip. Vari.","Irrigation", "CO2", 
-                                               "Res.+Non-Res.", "Mult. Res.", "Res.", "Non-Res.")))
-
-responses<-c(
-  evenness_change_abs = "Evenness Change", 
-  gains = "Species Gains", 
-  losses = "Species Losses",
-  rank_change = "Rank Change",
-  richness_change_abs = "Richness Change", 
-  any_change = "Any Change")
-
-##overall how many experiments saw some aspect of change.
-ggplot(tograph_metrics_trt, aes(x = trt_type3, y = value, fill = sig)) +
-  geom_col(width = 0.7) +
-  coord_flip() +
-  theme_minimal() + 
-  scale_x_discrete(labels=c("Mult. Nuts.", "Phosphorus","Nitrogen","Temperature" , "Precip. Vari.","Irrigation","CO2", "Res.+Non-Res.","Multiple Res.","Single Res.","Non-Res." , "All GCDs"))+
-  scale_fill_brewer(name = "Treatment vs. Control", labels = c("Not significant", "Significant")) +
-  labs(x = "Treatment", y = "Proportion of communities") +
-  theme(legend.position = "top")+
-  geom_vline(xintercept=7.5, size=0.5)+
-  facet_wrap(~group, labeller=labeller(group = responses), ncol = 2)
