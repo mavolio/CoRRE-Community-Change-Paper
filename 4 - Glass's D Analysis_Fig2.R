@@ -12,7 +12,7 @@ library(grid)
 library(gridExtra)
 
 #Meghan's working directory
-setwd("C:\\Users\\mavolio2\\Dropbox\\")
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
 
 
 theme_set(theme_bw(12))
@@ -20,22 +20,22 @@ theme_set(theme_bw(12))
 
 # Read in necessary datasets ----------------------------------------------
 
-change_metrics <- read.csv("C2E/Products/CommunityChange/March2018 WG/CoRRE_RAC_Metrics.csv") %>%
+change_metrics <- read.csv("CoRRE_RAC_Measures.csv") %>%
   mutate(abs_richness_change = abs(richness_change),
          abs_evenness_change = abs(evenness_change))
 
-plot_mani<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformation_March2019.csv")%>%
+plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, plot_mani, treatment)%>%
   unique()
   
 
-subset<-read.csv("C2E/Products/CommunityChange/March2018 WG/Experiment_Trt_Subset.csv")%>%
+subset<-read.csv("Experiment_Trt_Subset.csv")%>%
   select(-trt_type2)
 
 # read in treatment variables for sub-setting later
 ##info on GCD treatment
-info.trt<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformation_March2019.csv")%>%
+info.trt<-read.csv("ExperimentInformation_March2019.csv")%>%
   select(site_code, project_name, community_type, treatment,plot_mani, resource_mani, trt_type)%>%
   unique()%>%
   filter(plot_mani!=0)%>%
@@ -66,7 +66,7 @@ info.trt<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformat
                                                                                                                                                                              ifelse(trt_type=="N*irr*CO2", "mult_res", 999))))))))))))))))))))))))
 
 ##info on GCD treatment type
-info.trt2<-read.csv("C2E\\Products\\CommunityChange\\March2018 WG\\ForAnalysis_allAnalysisAllDatasets_04082019.csv") %>%
+info.trt2<-read.csv("SiteExperimentDetails_April2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
