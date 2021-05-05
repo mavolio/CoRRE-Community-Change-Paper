@@ -9,25 +9,25 @@ library(tidyverse)
 library(gridExtra)
 
 #meghan's working directory
-setwd("C:\\Users\\mavolio2\\Dropbox\\")
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
 theme_set(theme_bw(12))
 
 
 # read in the data --------------------------------------------------------
 
-change_metrics <- read.csv("C2E/Products/CommunityChange/March2018 WG/CoRRE_RAC_Metrics.csv") %>%
+change_metrics <- read.csv("CoRRE_RAC_Measures.csv") %>%
   mutate(richness_change_abs = abs(richness_change),
          evenness_change_abs = abs(evenness_change))%>%
   select(-richness_change, -evenness_change)
 
-plot_mani<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformation_March2019.csv")%>%
+plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, plot_mani, treatment)%>%
   unique()
 
-subset_studies<-read.csv("C2E/Products//CommunityChange//March2018 WG//experiment_trt_subset.csv")
+subset_studies<-read.csv("Experiment_Trt_Subset.csv")
 
-gam_sig<-read.csv("C2E/Products/CommunityChange/March2018 WG/gam_metrics_sig_change_Dec2020.csv")%>%
+gam_sig<-read.csv("gam_metrics_sig_change_Dec2020.csv")%>%
   filter(response_var!="richness_change_abs")%>%
   right_join(subset_studies)%>%
   select(site_project_comm, treatment, response_var, sig_diff_cntrl_trt)%>%
