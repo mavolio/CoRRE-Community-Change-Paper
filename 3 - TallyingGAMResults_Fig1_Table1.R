@@ -15,9 +15,6 @@ theme_set(theme_bw(base_size=20))
 
 #work
 setwd("C:\\Users\\mavolio2\\Dropbox\\")
-#home
-setwd("~/Dropbox/")
-
 
 # Read in data and clean --------------------------------------------------
 
@@ -139,8 +136,8 @@ adjp_sig<-adjp%>%
 
 metrics_sig<-adjp_sig
 
-#Write table of significant changes when padjusted for OrderofChange R code
-write.csv(metrics_sig, 'C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\Summer2018_Results\\gam_metrics_sig_change_Dec2020.csv', row.names = F )
+#Write table of significant changes when p-adjusted for OrderofChange R code
+write.csv(metrics_sig, 'C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG\\gam_metrics_sig_change_Dec2020.csv', row.names = F )
 
 metrics_sig_tally <- metrics_sig %>%
   group_by(response_var) %>%
