@@ -15,7 +15,7 @@ library(car)
 library(gridExtra)
 
 #Meghan's working directory
-setwd("C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG")
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
 
 theme_set(theme_bw(12))
 theme_update(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
@@ -23,7 +23,7 @@ theme_update(panel.grid.major=element_blank(), panel.grid.minor=element_blank())
 
 
 # reading in the data -----------------------------------------------------
-change_metrics <- read.csv("CoRRE_RAC_Metrics.csv") %>%
+change_metrics <- read.csv("CoRRE_RAC_Measures.csv") %>%
   mutate(abs_richness_change = abs(richness_change),
          abs_evenness_change = abs(evenness_change))
 
@@ -35,7 +35,7 @@ plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
   unique()
 
 # read in site level predictor variables
-info.spc=read.csv("ForAnalysis_allAnalysisAllDatasets_04082019.csv") %>%
+info.spc=read.csv("SiteExperimentDetails_April2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, rrich, anpp, MAT, MAP)%>%
   unique()
@@ -46,7 +46,7 @@ controls<-change_metrics%>%
   filter(plot_mani==0)%>%
   unique()
 
-div_evar<-read.csv("CORRE_DivEvar.csv")
+div_evar<-read.csv("CORRE_RichEvar.csv")
 
 evenness<-div_evar%>%
   right_join(controls)%>%
@@ -55,7 +55,7 @@ evenness<-div_evar%>%
 
 
 # read in site level predictor variables
-info.spc=read.csv("ForAnalysis_allAnalysisAllDatasets_04082019.csv") %>%
+info.spc=read.csv("SiteExperimentDetails_April2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, rrich, anpp, MAT, MAP)%>%
   unique()
