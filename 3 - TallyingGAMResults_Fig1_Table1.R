@@ -20,10 +20,9 @@ setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscr
 
 
 #read in and drop successional treatments (those that had a big disturbance to start)
-gam<-read.csv("gam_comparison_table_last_year.csv")%>%
+gam<-read.csv("GamSigTable.csv")%>%
   rename(site_project_comm=site_proj_comm)%>%
-  separate(site_project_comm, into=c("site_code","project_name","community_type"), sep="_", remove=F)%>%
-  filter(response_var != "composition_change")
+  separate(site_project_comm, into=c("site_code","project_name","community_type"), sep="_", remove=F)
 
 #filter the press treatments for the experiments with enough data
 trt_touse<-read.csv("ExperimentInformation_March2019.csv")%>%
@@ -34,7 +33,7 @@ trt_touse<-read.csv("ExperimentInformation_March2019.csv")%>%
   mutate(use=ifelse(trt_type=="N"|trt_type=="P"|trt_type=="CO2"|trt_type=="irr"|trt_type=="temp"|trt_type=="N*P"|trt_type=="mult_nutrient"|trt_type=='precip_vari', 1, 0))
 
 #make new categories of treatments into resource, non-resource, multiple resources, and res+non res.
-info.trt2<-read.csv("SiteExperimentDetails_April2019.csv") %>%
+info.trt2<-read.csv("SiteExperimentDetails_March2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
@@ -137,7 +136,7 @@ adjp_sig<-adjp%>%
 metrics_sig<-adjp_sig
 
 #Write table of significant changes when p-adjusted for OrderofChange R code
-write.csv(metrics_sig, 'gam_metrics_sig_change_Dec2020.csv', row.names = F )
+write.csv(metrics_sig, 'GamSigTable_Padjust.csv', row.names = F )
 
 metrics_sig_tally <- metrics_sig %>%
   group_by(response_var) %>%
@@ -158,7 +157,7 @@ metrics_all<-metrics_sig%>%
 #overall diff in metrics of change - NO
 prop.test(x=as.matrix(metrics_sig_tally[c('num_sig', 'num_nonsig')]), alternative='two.sided')
 
-vector_overall<-data.frame("response_var"=c("all","all"), sig=c("psig", "pnsig"), value = c(0.7077, 0.2922), response_var2=c("Any Change", "Any Change")) 
+vector_overall<-data.frame("response_var"=c("all","all"), sig=c("psig", "pnsig"), value = c(0.7123, 0.2877), response_var2=c("Any Change", "Any Change")) 
 
 
 ###how does this differ by GCD (e.g. C02 and N)?
