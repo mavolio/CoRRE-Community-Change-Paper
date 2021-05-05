@@ -14,19 +14,19 @@ theme_set(theme_bw(base_size=20))
 
 
 #work
-setwd("C:\\Users\\mavolio2\\Dropbox\\")
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
 
 # Read in data and clean --------------------------------------------------
 
 
-#read in and drop sucessional treatments (those that had a big disturbance to start)
-gam<-read.csv("C2E/Products/CommunityChange/Summer2018_Results/gam_comparison_table_last_year.csv")%>%
+#read in and drop successional treatments (those that had a big disturbance to start)
+gam<-read.csv("gam_comparison_table_last_year.csv")%>%
   rename(site_project_comm=site_proj_comm)%>%
   separate(site_project_comm, into=c("site_code","project_name","community_type"), sep="_", remove=F)%>%
   filter(response_var != "composition_change")
 
 #filter the press treatments for the experiments with enough data
-trt_touse<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInformation_March2019.csv")%>%
+trt_touse<-read.csv("ExperimentInformation_March2019.csv")%>%
   filter(pulse==0, plot_mani!=0)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_")) %>% 
   select(site_project_comm, treatment, trt_type)%>%
@@ -34,7 +34,7 @@ trt_touse<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInforma
   mutate(use=ifelse(trt_type=="N"|trt_type=="P"|trt_type=="CO2"|trt_type=="irr"|trt_type=="temp"|trt_type=="N*P"|trt_type=="mult_nutrient"|trt_type=='precip_vari', 1, 0))
 
 #make new categories of treatments into resource, non-resource, multiple resources, and res+non res.
-info.trt2<-read.csv("C2E\\Products\\CommunityChange\\March2018 WG\\ForAnalysis_allAnalysisAllDatasets_04082019.csv") %>%
+info.trt2<-read.csv("SiteExperimentDetails_April2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
@@ -82,7 +82,7 @@ gam_trt<-gam_touse%>%
   unique()
 
 #export list of experiments and treatments we are using
-write.csv(gam_trt, "C2E/Products/CommunityChange/March2018 WG/Experiment_Trt_Subset.csv", row.names=F)
+write.csv(gam_trt, "Experiment_Trt_Subset.csv", row.names=F)
 
 ##how many treatments
 sum_trts<-gam_trt%>%
@@ -104,7 +104,7 @@ summary_res<-info.trt2%>%
   summarize(n=length(trt_type3))
 
 
-# Correcting for multiple comparisions ------------------------------------
+# Correcting for multiple comparisons ------------------------------------
 
 
 ###adjusting for multiple comparisons
@@ -137,7 +137,7 @@ adjp_sig<-adjp%>%
 metrics_sig<-adjp_sig
 
 #Write table of significant changes when p-adjusted for OrderofChange R code
-write.csv(metrics_sig, 'C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG\\gam_metrics_sig_change_Dec2020.csv', row.names = F )
+write.csv(metrics_sig, 'gam_metrics_sig_change_Dec2020.csv', row.names = F )
 
 metrics_sig_tally <- metrics_sig %>%
   group_by(response_var) %>%
