@@ -36,8 +36,8 @@ data_file <- "CoRRE_RAC_Metrics.csv"
 setwd(work_dir)
 
 # ##meghan's computer
-setwd("C:\\Users\\mavolio2\\Dropbox\\C2E\\Products\\CommunityChange\\March2018 WG")
-dat<-read.csv("CoRRE_RAC_Metrics.csv")
+setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
+dat<-read.csv("CoRRE_RAC_Measures.csv")
 treatment_info<-read.csv("ExperimentInformation_March2019.csv")%>%
   dplyr::select(site_code, project_name, community_type, treatment,plot_mani)%>%
   unique()%>%
