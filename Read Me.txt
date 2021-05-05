@@ -4,13 +4,19 @@ The R files are run in this order.
 
 1. RAC Changes.R
 
-Due to the nature of a large collaborative database, not all datasets are public, therefore the initial data to create the dataset of community changes is not public. This code is just an example of how to use the codyn fucntions to get the dataset used in all subsequent analyses.
+Due to the nature of a large collaborative database, not all datasets are public, therefore the initial data to create the dataset of community changes is not public. 
+This code is uses the codyn fucntions to get the main dataset of community changes used in all subsequent analyses. At the end there are additional checks on the analyses.
+
+
+File inputs:
+Experiment_Trt_Subset.csv
+ExperiemntInformation_March2019.csv
 
 File exports:
 
-CoRRE_RAC_Metrics.csv
-CoRRE_DivEvar.csv
-CoRRE_RAC_Metrics_norares.csv
+CoRRE_RAC_Measures.csv
+CoRRE_RichEvar.csv
+CoRRE_RAC_Measures_norares.csv
 
 
 
@@ -19,7 +25,7 @@ CoRRE_RAC_Metrics_norares.csv
 Code to do GAM analysis
 
 File inputs:
-CoRRE_RAC_Metrics.csv
+CoRRE_RAC_Measures.csv
 ExperimentInformation_March2019.csv
 
 File exports:
@@ -33,7 +39,7 @@ Code to Make Table 1 and Figure 1
 File inputs:
 gam_compmarision_table_last_year.csv
 ExperimentInformation_March2019.csv
-ForAnalysis_allanalysisAllDatasets_04082019.csv
+SiteExperimentDetails_April2019.csv
 
 File exports:
 Experiment_Trt_Subset.csv
@@ -44,17 +50,17 @@ gam_metrics_sig_change_Dec2020.csv
 Code to make Fig2 and Fig S2/S4
 
 File inputs:
-CoRRE_RAC_Metrics.csv
+CoRRE_RAC_Measures.csv
 ExperimentInformation_March2019.csv
 Experiment_Trt_Subset
-ForAnalysis_allanalysisAllDatasets_04082019.csv
+SiteExperimentDetails_April2019.csv
 
 5. OrderofChange_Fig3
 
 Code to test the order of community compositional changes and Figure 3
 
 File inputs:
-CoRRE_RAC_Metrics.csv
+CoRRE_RAC_Measures.csv
 ExperimentInformation_March2019.csv
 Experiment_Trt_Subset.csv
 gam_metrics_sig_change_Dec2020.csv
@@ -64,10 +70,10 @@ gam_metrics_sig_change_Dec2020.csv
 Code to make Fig 4 and Fig S5
 
 File inputs:
-CoRRE_RAC_Metrics.csv
+CoRRE_RAC_Measures.csv
 Experiment_Trt_Subset
 ExperimentInformation_March2019.csv
-ForAnalysis_allAnalysisAllDatasets_04082019.csv
+SiteExperimentDetails_April2019.csv
 CoRRE_DivEvar.csv
 
 ######
