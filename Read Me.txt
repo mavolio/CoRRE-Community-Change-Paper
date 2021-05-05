@@ -1,0 +1,77 @@
+Here is all the code to accompany Avolio et al. 2021. Determinants of community compositional change are equally affected by global change.
+
+The R files are run in this order.
+
+1. RAC Changes.R
+
+Due to the nature of a large collaborative database, not all datasets are public, therefore the initial data to create the dataset of community changes is not public. This code is just an example of how to use the codyn fucntions to get the dataset used in all subsequent analyses.
+
+File exports:
+
+CoRRE_RAC_Metrics.csv
+CoRRE_DivEvar.csv
+CoRRE_RAC_Metrics_norares.csv
+
+
+
+2. fit_cumulative_gam_interactions.R 
+
+Code to do GAM analysis
+
+File inputs:
+CoRRE_RAC_Metrics.csv
+ExperimentInformation_March2019.csv
+
+File exports:
+gam_comparision_table_last_year.csv
+
+
+3. TallyingGAMResults_Fig1_Table1
+
+Code to Make Table 1 and Figure 1
+
+File inputs:
+gam_compmarision_table_last_year.csv
+ExperimentInformation_March2019.csv
+ForAnalysis_allanalysisAllDatasets_04082019.csv
+
+File exports:
+Experiment_Trt_Subset.csv
+gam_metrics_sig_change_Dec2020.csv
+
+4. Glass's D Analysis_Fig2
+
+Code to make Fig2 and Fig S2/S4
+
+File inputs:
+CoRRE_RAC_Metrics.csv
+ExperimentInformation_March2019.csv
+Experiment_Trt_Subset
+ForAnalysis_allanalysisAllDatasets_04082019.csv
+
+5. OrderofChange_Fig3
+
+Code to test the order of community compositional changes and Figure 3
+
+File inputs:
+CoRRE_RAC_Metrics.csv
+ExperimentInformation_March2019.csv
+Experiment_Trt_Subset.csv
+gam_metrics_sig_change_Dec2020.csv
+
+6. PredictorsofChange_Fig4
+
+Code to make Fig 4 and Fig S5
+
+File inputs:
+CoRRE_RAC_Metrics.csv
+Experiment_Trt_Subset
+ExperimentInformation_March2019.csv
+ForAnalysis_allAnalysisAllDatasets_04082019.csv
+CoRRE_DivEvar.csv
+
+######
+Additional code to do anlayses without R species is provided:
+Appendix - fit_cumulative_gam_interactions_norare.R
+Appendix - No Rare - TallyGameResults
+
