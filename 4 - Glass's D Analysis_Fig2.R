@@ -66,7 +66,7 @@ info.trt<-read.csv("ExperimentInformation_March2019.csv")%>%
                                                                                                                                                                              ifelse(trt_type=="N*irr*CO2", "mult_res", 999))))))))))))))))))))))))
 
 ##info on GCD treatment type
-info.trt2<-read.csv("SiteExperimentDetails_April2019.csv") %>%
+info.trt2<-read.csv("SiteExperimentDetails_March2019.csv") %>%
   mutate(site_project_comm = paste(site_code, project_name, community_type, sep="_"))%>%
   select(site_project_comm, treatment, trt_type)%>%
   unique()%>%
