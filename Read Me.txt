@@ -9,8 +9,8 @@ This code is uses the codyn fucntions to get the main dataset of community chang
 
 
 File inputs:
-Experiment_Trt_Subset.csv
-ExperiemntInformation_March2019.csv
+Experiment_Trt_Subset.csv *this is created in set 2.
+ExperimentInformation_March2019.csv
 
 File exports:
 
@@ -20,7 +20,7 @@ CoRRE_RAC_Measures_norares.csv
 
 
 
-2. fit_cumulative_gam_interactions.R 
+2. FitGamInteractions.R 
 
 Code to do GAM analysis
 
@@ -29,7 +29,7 @@ CoRRE_RAC_Measures.csv
 ExperimentInformation_March2019.csv
 
 File exports:
-gam_comparision_table_last_year.csv
+GamSigTable.csv
 
 
 3. TallyingGAMResults_Fig1_Table1
@@ -37,13 +37,13 @@ gam_comparision_table_last_year.csv
 Code to Make Table 1 and Figure 1
 
 File inputs:
-gam_compmarision_table_last_year.csv
+GamSigTable.csv
 ExperimentInformation_March2019.csv
 SiteExperimentDetails_April2019.csv
 
 File exports:
 Experiment_Trt_Subset.csv
-gam_metrics_sig_change_Dec2020.csv
+GamSigTable_Padjust.csv
 
 4. Glass's D Analysis_Fig2
 
@@ -63,7 +63,7 @@ File inputs:
 CoRRE_RAC_Measures.csv
 ExperimentInformation_March2019.csv
 Experiment_Trt_Subset.csv
-gam_metrics_sig_change_Dec2020.csv
+GamSigTable_Padjust.csv
 
 6. PredictorsofChange_Fig4
 
@@ -78,6 +78,6 @@ CoRRE_DivEvar.csv
 
 ######
 Additional code to do anlayses without R species is provided:
-Appendix - fit_cumulative_gam_interactions_norare.R
+Appendix - No Rare - FitGAMInteractions.R
 Appendix - No Rare - TallyGameResults
 
