@@ -319,8 +319,8 @@ ggplot(data=glassD_alldata_box, aes(x=trt_type2, y=abs(mglassd), fill=trt_type2)
 
 
 # Figure S2 - Relationship between treatment level and community change ---------------
-info.trt.levels<-read.csv("converge_diverge/datasets/LongForm/ExperimentInformation_March2019.csv")%>%
-  select(site_code, project_name, community_type, treatment,plot_mani, resource_mani, trt_type, n, p, temp, precip, CO2)%>%
+info.trt.levels<-read.csv("ExperimentInformation_March2019_TrtLevels.csv")%>%
+  select(site_code, project_name, community_type, treatment,plot_mani, trt_type, n, p, temp, precip, CO2)%>%
   unique()%>%
   filter(plot_mani!=0)%>%
   mutate(site_project_comm=paste(site_code, project_name, community_type, sep="_"))%>%
