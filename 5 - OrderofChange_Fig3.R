@@ -25,9 +25,9 @@ plot_mani<-read.csv("C2E/Products/CommunityChange/March2018 WG/ExperimentInforma
   select(site_project_comm, plot_mani, treatment)%>%
   unique()
 
-subset_studies<-read.csv("C2E/Products//CommunityChange//March2018 WG//Experiment_Trt_Subset.csv")
+subset_studies<-read.csv("C2E/Products//CommunityChange//March2018 WG//experiment_trt_subset.csv")
 
-gam_sig<-read.csv("C2E/Products/CommunityChange/Summer2018_Results/gam_metrics_sig_change_Dec2020.csv")%>%
+gam_sig<-read.csv("C2E/Products/CommunityChange/March2018 WG/gam_metrics_sig_change_Dec2020.csv")%>%
   filter(response_var!="richness_change_abs")%>%
   right_join(subset_studies)%>%
   select(site_project_comm, treatment, response_var, sig_diff_cntrl_trt)%>%
