@@ -27,7 +27,7 @@ plot_mani<-read.csv("ExperimentInformation_March2019.csv")%>%
 
 subset_studies<-read.csv("Experiment_Trt_Subset.csv")
 
-gam_sig<-read.csv("gam_metrics_sig_change_Dec2020.csv")%>%
+gam_sig<-read.csv("GamSigTable_Padjust.csv")%>%
   filter(response_var!="richness_change_abs")%>%
   right_join(subset_studies)%>%
   select(site_project_comm, treatment, response_var, sig_diff_cntrl_trt)%>%
@@ -128,7 +128,7 @@ rank_table<-rank_sig%>%
   summarize(num=length(order))%>%
   mutate(first=substring(order,1,1))%>%
   arrange(first, -num)%>%
-  mutate(ordered=seq(1:50),
+  mutate(ordered=seq(1:51),
          first1=factor(first, levels=c("E", "R", "G", "L")))
 
 # Making figure 3 ---------------------------------------------------------
