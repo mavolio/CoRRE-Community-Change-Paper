@@ -30,14 +30,10 @@ library(mgcv)
 ####
 ####  SET WORKING DIRECTORIES AND FILENAMES ------------------------------------
 ####
-work_dir  <- "~/Repos/C2E/Community Paper/" # change as needed
-data_dir  <- "~/Dropbox/C2E/Products/CommunityChange/March2018 WG"
-results_dir <- "~/Dropbox/C2E/Products/CommunityChange/Summer2018_Results/"
-data_file <- "CoRRE_RAC_Metrics.csv"
-setwd(work_dir)
 
 # ##meghan's computer
 setwd("C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\")
+
 dat<-read.csv("CoRRE_RAC_Measures.csv")
 treatment_info<-read.csv("ExperimentInformation_March2019.csv")%>%
   dplyr::select(site_code, project_name, community_type, treatment,plot_mani)%>%
@@ -65,11 +61,18 @@ fit_compare_gams <- function(df, response, diff_type = "last_year"){
   #  A tibble with LLR delta deviance, LLR p-value, and delta AIC
   
   # Check that there aren't too many NAs and skip modeling if fraction > 0.5
-  y <- df[ , response]
-  num_nas <- length(which(is.na(y)))
-  fraction_nas <- num_nas/nrow(y)
+  y <- df %>% pull(response)
+  # num_nas <- length(which(is.na(y)))
+  # fraction_nas <- num_nas/length(y)
   
-  if(fraction_nas >= 0.5){
+  fraction_nas <- df %>% 
+    ungroup() %>%
+    dplyr::select(response, treatment) %>%
+    group_by(treatment) %>%
+    summarize(frac_nas = sum(is.na(UQ(rlang::sym(response)))) / n())
+  test <- length(which(fraction_nas$frac_nas > 0.5))
+  
+  if(test | length(unique(y)) < 2){
     return(
       tibble(
         response_var = response,
@@ -85,7 +88,7 @@ fit_compare_gams <- function(df, response, diff_type = "last_year"){
     )
   }
   
-  if(fraction_nas <= 0.5){
+  if(!test & length(unique(y)) > 1){
     test_formula <- as.formula(
       paste(response, 
             "~ treatment + s(treatment_year, by = treatment, k = (num_years-1)) + 
@@ -100,73 +103,100 @@ fit_compare_gams <- function(df, response, diff_type = "last_year"){
       )
     )
     
-    gam_test <- gam(
-      test_formula, 
-      data = df,
-      method = "REML"
-    )
-    
-    gam_null <- gam(
-      null_formula,
-      data = df, 
-      method = "REML"
-    )
-    
-    # LLR tests
-    pvalue <- anova(gam_null, gam_test, test="Chisq")$`Pr(>Chi)`[2]
-    dev <- anova(gam_null, gam_test, test="Chisq")$`Resid. Dev`
-    delta_div <- diff(dev)  # full - null
-    
-    # AIC tests
-    aics <- AIC(gam_null, gam_test)$AIC
-    delta_aic <- diff(aics)  # full - null
-    
-    # Simulate predictions from the interaction model
-    min_year <- min(df$treatment_year)
-    max_year <- max(df$treatment_year)
-    pdat <- expand.grid(
-      treatment_year = seq(min_year, max_year, by = 1),
-      treatment = unique(df$treatment)
-    )
-    pdat$plot_id <- unique(df$plot_id)[1]
-    
-    control_name <- filter(df, plot_mani == 0) %>% pull(treatment) %>% unique()
-    treat_name <- filter(df, plot_mani != 0) %>% pull(treatment) %>% unique()
-    tmp_diffs <- smooth_diff(model = gam_test, newdata = pdat, 
-                             f1 = treat_name, 
-                             f2 = control_name, 
-                             var = "treatment", alpha = 0.05, 
-                             unconditional = FALSE)
-    
-    if(diff_type == "all_years"){
-      outdiff <- as.data.frame(t(colMeans(tmp_diffs[c("diff","se","upper","lower")])))
-      outdiff$treatment_year <- NA
-    }
-    
-    if(diff_type == "mid_year"){
-      # find median index, rounds up
-      # mid_year <- floor(0.5 + median(1:nrow(tmp_diffs)))
-      mid_year <- 5
-      outdiff <- tmp_diffs[mid_year,] 
-    }
-    
-    if(diff_type == "last_year"){
-      outdiff <- tail(tmp_diffs, 1)
-    }
-    
-    return(
-      tibble(
-        response_var = response,
-        p_value = pvalue,
-        delta_deviance = delta_div,
-        delta_aic = delta_aic,
-        diff = outdiff$diff,
-        diff_se = outdiff$se,
-        diff_lower = outdiff$lower,
-        diff_upper = outdiff$upper,
-        diff_treatment_year = outdiff$treatment_year
+    gam_test <- tryCatch(expr = {
+      gam(
+        test_formula, 
+        data = df,
+        method = "REML",
+        family = gaussian(link = "identity")
       )
-    )
+    }, error = function(e) e, warning = function(w) w)
+    
+    
+    gam_null <- tryCatch(expr = {
+      gam(
+        null_formula, 
+        data = df,
+        method = "REML",
+        family = gaussian(link = "identity")
+      )
+    }, error = function(e) e, warning = function(w) w)
+    
+    test1 <- class(gam_test)[1] %in% c("simpleWarning", "simpleError", "try-error")
+    test2 <- class(gam_null)[1] %in% c("simpleWarning", "simpleError", "try-error")
+    
+    if(test1 == FALSE & test2 == FALSE) {
+      # LLR tests
+      pvalue <- anova(gam_null, gam_test, test="Chisq")$`Pr(>Chi)`[2]
+      dev <- anova(gam_null, gam_test, test="Chisq")$`Resid. Dev`
+      delta_div <- diff(dev)  # full - null
+      
+      # AIC tests
+      aics <- AIC(gam_null, gam_test)$AIC
+      delta_aic <- diff(aics)  # full - null
+      
+      # Simulate predictions from the interaction model
+      min_year <- min(df$treatment_year)
+      max_year <- max(df$treatment_year)
+      pdat <- expand.grid(
+        treatment_year = seq(min_year, max_year, by = 1),
+        treatment = unique(df$treatment)
+      )
+      pdat$plot_id <- unique(df$plot_id)[1]
+      
+      control_name <- filter(df, plot_mani == 0) %>% pull(treatment) %>% unique()
+      treat_name <- filter(df, plot_mani != 0) %>% pull(treatment) %>% unique()
+      tmp_diffs <- smooth_diff(model = gam_test, newdata = pdat, 
+                               f1 = treat_name, 
+                               f2 = control_name, 
+                               var = "treatment", alpha = 0.05, 
+                               unconditional = FALSE)
+      
+      if(diff_type == "all_years"){
+        outdiff <- as.data.frame(t(colMeans(tmp_diffs[c("diff","se","upper","lower")])))
+        outdiff$treatment_year <- NA
+      }
+      
+      if(diff_type == "mid_year"){
+        # find median index, rounds up
+        # mid_year <- floor(0.5 + median(1:nrow(tmp_diffs)))
+        mid_year <- 5
+        outdiff <- tmp_diffs[mid_year,] 
+      }
+      
+      if(diff_type == "last_year"){
+        outdiff <- tail(tmp_diffs, 1)
+      }
+      
+      return(
+        tibble(
+          response_var = response,
+          p_value = pvalue,
+          delta_deviance = delta_div,
+          delta_aic = delta_aic,
+          diff = outdiff$diff,
+          diff_se = outdiff$se,
+          diff_lower = outdiff$lower,
+          diff_upper = outdiff$upper,
+          diff_treatment_year = outdiff$treatment_year
+        )
+      )
+    } else {
+      return(
+        tibble(
+          response_var = response,
+          p_value = -9999,
+          delta_deviance = NA,
+          delta_aic = NA,
+          diff = NA,
+          diff_se = NA,
+          diff_lower = NA,
+          diff_upper = NA,
+          diff_treatment_year = NA
+        )
+      )
+    }
+    
   }
   
 }  # end of model fit and comparison function
@@ -244,8 +274,7 @@ fill_empties <- function(...){
         "evenness_change_abs", 
         "rank_change", 
         "gains", 
-        "losses",
-        "composition_change"
+        "losses"
       ),
       p_value = NA,
       delta_deviance = NA,
@@ -264,11 +293,11 @@ fill_empties <- function(...){
 ####
 ####  READ IN DATA AND CALCULATE CUMULATIVE CHANGE -----------------------------
 ####
+# change_metrics <- as_tibble(read.csv(paste0(data_dir, data_file))) %>%
+#   dplyr::select(-X) 
 
-change_metrics<-dat%>%
-  left_join(treatment_info)%>%
-  mutate(treatment=as.factor(treatment))
-
+change_metrics <- as_tibble(dat) %>%
+  left_join(treatment_info)
 
 ##  Calculate cumulative sums of each metric (from Kevin)
 change_cumsum <- change_metrics %>%
@@ -285,7 +314,8 @@ change_cumsum <- change_metrics %>%
                  losses), 
             list(cumsum)) %>%
   mutate(control = ifelse(plot_mani==0,"control","treatment")) %>%
-  arrange(site_project_comm, plot_id, treatment_year)
+  arrange(site_project_comm, plot_id, treatment_year) %>%
+  ungroup()
 
 
 
@@ -305,6 +335,9 @@ for(do_site in all_sites){
   for(do_treatment in all_treatments){
     treatment_data <- filter(site_treatments, treatment == do_treatment)
     model_data <- rbind(site_controls, treatment_data)
+    model_data <- model_data %>%
+      mutate(plot_id = as.factor(plot_id),
+             treatment = as.factor(treatment))
     num_years <- length(unique(model_data$treatment_year))
     
     # Skip data with less than three pairs of years
@@ -326,6 +359,13 @@ for(do_site in all_sites){
     
     # Compare models for data with more than four pairs of years
     if(num_years > 3){
+      
+      model_data <- model_data %>%
+        mutate(richness_change_abs = richness_change_abs + 0.001,
+               evenness_change_abs = evenness_change_abs + 0.001,
+               rank_change = rank_change + 0.001,
+               gains = gains + 0.001,
+               losses = losses + 0.001)
       
       # Richness
       rich_test <- fit_compare_gams(
@@ -363,19 +403,19 @@ for(do_site in all_sites){
       )
       
       # Compositional change
-      comp_test <- fit_compare_gams(
-        df = model_data,
-        response = "composition_change",
-        diff_type
-      )
+      # comp_test <- fit_compare_gams(
+      #   df = model_data,
+      #   response = "composition_change",
+      #   diff_type
+      # )
       
       tmp_out <- bind_rows(
         rich_test,
         even_test,
         rank_test,
         gain_test,
-        loss_test,
-        comp_test
+        loss_test
+        # comp_test
       ) %>%
         mutate(
           site_proj_comm = do_site,
@@ -399,7 +439,7 @@ for(do_site in all_sites){
     
     all_comparisons <- all_comparisons %>%
       bind_rows(tmp_out)
-      
+    
   } # end treatment loop
   
   print(paste("Done with site:", do_site))
@@ -424,8 +464,4 @@ save_comparisons <- all_comparisons %>%
     sig_diff_cntrl_trt = ifelse(is.na(sig_diff_cntrl_trt) == TRUE, "no", sig_diff_cntrl_trt)
   )
 
-outfile <- paste0("gam_comparison_table_", diff_type, ".csv")
-write_csv(
-  x = save_comparisons,
-  path = paste0(results_dir, outfile)
-)
+write.csv(save_comparisons, "C:\\Users\\mavolio2\\Dropbox\\Manuscripts\\C2E- Community change\\Manuscript\\Submit EL\\Revision\\Final submission\\Datafiles\\GamSigTable.csv", row.names=F)
